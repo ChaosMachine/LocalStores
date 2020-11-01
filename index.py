@@ -10,12 +10,18 @@ import dash_leaflet.express as dlx
 from functions import get_location
 from dash.dependencies import Input, Output, State
 from flask import Flask
-from test_db import User
+from test_db import User, db
+
+
 
 # Generate some in-memory data.
 
+
+
+
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.config['suppress_callback_exceptions']=True
 # For Heroku deployment.
 
 locations=[]
@@ -59,13 +65,19 @@ friendsRanking = dbc.Table.from_dataframe(df_ranking, striped=True, bordered=Tru
 
 
 app.layout = html.Div([
+    html.Div(id="lon"),
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
+
+dashboard = html.Div([
 
     dbc.Nav(
         [
             dbc.NavbarBrand(html.H3("Local Heroes"), className="ml-2"),
             dbc.NavLink("Dashboard", href="#"),
-            dbc.NavLink("Sign-Up as Customer", href="#"),
-            dbc.NavLink("Sign-Up as Owner", href="#"),
+            dbc.NavLink("Sign-Up as Customer", href="/customerlogin"),
+            dbc.NavLink("Sign-Up as Owner", href="/ownerlogin"),
             dbc.NavLink("Login", href="#"),
             dbc.NavLink("Invite Friends", href="#"),
         ], className= 'navbar navbar-expand-lg navbar-light bg-light fixed-top'
@@ -77,6 +89,7 @@ app.layout = html.Div([
 #        html.Div(id="lon"), html.Div(id="lat")
 #    ], className="pt-5"),
     # Row: Map + Bar Chart
+
     html.Div([
         # Column: Map
         html.Div([
@@ -136,6 +149,59 @@ app.layout = html.Div([
     ], className="row mt-5"),
 
 ], className="container-fluid pt-5")
+
+customerlogin_layout = dbc.Container([
+    dbc.FormGroup([
+        dbc.InputGroup([
+            dbc.Input(id="Username", placeholder="Username")],className="mt-5"),
+dbc.InputGroup([
+            dbc.Input(id="Password", placeholder="Password")],className="mt-2"),
+        dbc.Button("Confirm_customer",id='Add_customer', color="primary", className="mr-1 mt-2"),
+
+    ]),
+    html.A("back to Dashboard",href="/")
+], className="container login")
+
+
+home_page_layout = dbc.Container([])
+
+ownerlogin_layout = dbc.Container([
+                        dbc.FormGroup([
+                            dbc.InputGroup([
+                                dbc.Input(id="nameOwner", placeholder="Name")],className="mt-5"),
+                        dbc.InputGroup([
+                                dbc.Input(id="locationOwner", placeholder="Location")],className="mt-2"),
+                            dbc.Button("Confirm",id='Confirm_owner', color="primary", className="mr-1 mt-2")
+                        ]),
+                        html.A("back to Dashboard",href="/")
+                    ], className="container login")
+
+
+@app.callback(Output('page-content', 'children'),
+              [Input('url', 'pathname')])
+def display_page(pathname):
+
+    if pathname == '/':
+        return dashboard
+    elif pathname == '/customerlogin':
+        return customerlogin_layout
+    elif pathname == '/ownerlogin':
+        return ownerlogin_layout
+    else:
+        return '404'
+
+#@app.callback(
+#    Output('lon', 'children'),
+#    [Input('Confirm_owner', 'n_clicks')],
+#   [State('nameOwner','children'),
+#     State('locationOwner','children')])
+
+#def getCoordinates(n_clicks, name, location):
+#   if n_clicks:
+#        Owner = User(Name=name, Location=location)
+#        db.session.add(Owner)
+#        db.session.commit()
+#    return
 
 
 if __name__ == '__main__':
