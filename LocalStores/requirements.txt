@@ -1,0 +1,7 @@
+dash
+plotly
+pandas
+dash-bootstrap-components
+dash-leaflet
+flask
+flask-sqlalchemy

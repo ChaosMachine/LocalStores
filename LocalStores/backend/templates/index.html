@@ -1,0 +1,63 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Login</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+	</head>
+	<body>
+		<div class="login">
+			<h1>Login</h1>
+			<div class="links">
+				<a href="{{ url_for('login') }}" class="active">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+                <a href="{{ url_for('registerShop') }}">Register as owner</a>
+			</div>
+			<form action="{{ url_for('login') }}" method="post">
+				<label for="username">
+					<i class="fas fa-user"></i>
+				</label>
+				<input type="text" name="username" placeholder="Username" id="username" required>
+				<label for="password">
+					<i class="fas fa-lock"></i>
+				</label>
+				<input type="password" name="password" placeholder="Password" id="password" required>
+				<div class="msg">{{ msg }}</div>
+				<input type="submit" value="Login">
+			</form>
+		</div>
+	</body>
+</html>
+=======
+{% block title %}
+<title>Local Heroes</title>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{url_for('.static', filename='style.css')}}">
+{% endblock %}
+
+{% include "navbar.html" %}
+
+{% block content %}
+    <br><br><br><br><br><br>
+    <div class="container">
+      <div class="starter-template">
+        <h1>Local Heroes</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="starter-template">
+        <span class="user-type">
+            <a href="business"><button class="btn btn-success user-type-btn" type="button"><h3 class="no-pad">Business</h3></button></a>
+        </span>
+        <span class="user-type">
+            <a href="customer"><button class="btn btn-success user-type-btn" type="button"><h3 class="no-pad">Customer</h3></button></a>
+        </span>
+      </div>
+    </div>
+{% endblock %}
+>>>>>>> efa668cecbbd58fc41ada987376d984e03eb136b
