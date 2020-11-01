@@ -7,22 +7,23 @@ import plotly.graph_objs as go
 import plotly.express as px
 import dash_leaflet as dl
 import dash_leaflet.express as dlx
+from functions import get_location
 from dash.dependencies import Input, Output, State
+from flask import Flask
+from test_db import User
 
 # Generate some in-memory data.
-locations = [dict(lat=50.064840, lon=14.442720), dict(lat=50.082525, lon=14.451692), dict(lat=50.075539, lon=14.437800)]
-Prague1 = dlx.dicts_to_geojson(locations)
 
-
-
-
-
-app = dash.Dash(
-    __name__,
-    external_stylesheets=[dbc.themes.BOOTSTRAP]
-)
+server = Flask(__name__)
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
 # For Heroku deployment.
-server = app.server
+
+locations=[]
+stores = User.query.all()
+for store in stores:
+    lon, lat = get_location(store.Location)
+    locations.append(dict(lat=lat, lon=lon))
+Prague1 = dlx.dicts_to_geojson(locations)
 
 
 df_spending = pd.DataFrame({
@@ -72,7 +73,8 @@ app.layout = html.Div([
     # Row: Title
 #    html.Div([
 #        dbc.Input(id='inputLocation', type="text", className="col-4"),
-#        dbc.Button("Primary", color="primary", className="mr-1 mt-2")
+#        dbc.Button("Get location", id="confirmLocation", color="primary", className="mr-1 mt-2"),
+#        html.Div(id="lon"), html.Div(id="lat")
 #    ], className="pt-5"),
     # Row: Map + Bar Chart
     html.Div([
@@ -134,7 +136,6 @@ app.layout = html.Div([
     ], className="row mt-5"),
 
 ], className="container-fluid pt-5")
-
 
 
 if __name__ == '__main__':
