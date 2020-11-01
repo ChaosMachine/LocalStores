@@ -10,11 +10,15 @@ import dash_leaflet.express as dlx
 from dash.dependencies import Input, Output, State
 
 # Generate some in-memory data.
-Prague1 = dlx.dicts_to_geojson([dict(lat=50.064840, lon=14.442720), dict(lat=50.082525, lon=14.451692), dict(lat=50.075539, lon=14.437800)])
+locations = [dict(lat=50.064840, lon=14.442720), dict(lat=50.082525, lon=14.451692), dict(lat=50.075539, lon=14.437800)]
+Prague1 = dlx.dicts_to_geojson(locations)
+
+
 
 
 
 app = dash.Dash(
+    __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP]
 )
 # For Heroku deployment.
@@ -49,35 +53,60 @@ fig_spending.update_layout({
     "paper_bgcolor": "rgba(0, 0, 0, 0)",
 })
 
+regionalRanking = dbc.Table.from_dataframe(df_ranking, striped=True, bordered=True, hover=True)
+friendsRanking = dbc.Table.from_dataframe(df_ranking, striped=True, bordered=True, hover=True)
+
 
 app.layout = html.Div([
 
     dbc.Nav(
         [
-            dbc.NavbarBrand(html.H3("Local Heros"), className="ml-2"),
+            dbc.NavbarBrand(html.H3("Local Heroes"), className="ml-2"),
             dbc.NavLink("Dashboard", href="#"),
             dbc.NavLink("Sign-Up as Customer", href="#"),
             dbc.NavLink("Sign-Up as Owner", href="#"),
             dbc.NavLink("Login", href="#"),
+            dbc.NavLink("Invite Friends", href="#"),
         ], className= 'navbar navbar-expand-lg navbar-light bg-light fixed-top'
     ),
     # Row: Title
-
+#    html.Div([
+#        dbc.Input(id='inputLocation', type="text", className="col-4"),
+#        dbc.Button("Primary", color="primary", className="mr-1 mt-2")
+#    ], className="pt-5"),
     # Row: Map + Bar Chart
     html.Div([
         # Column: Map
         html.Div([
+            html.H5("Map of local stores and restaurants"),
             dl.Map(center=[50.064840, 14.442720], zoom=13, children=[
                     dl.TileLayer(),
                     dl.GeoJSON(data=Prague1),
                 # in-memory geojson (slowest option)
-                ], style={'width': '100%', 'height': '50vh', 'margin': "auto", "display": "block"}, id="map"),
+                ], style={'width': '100%', 'height': '35vh', 'margin': "auto", "display": "block"}, id="map"),
                 html.Div(id="stores")
-        ], className="col-md-8"),
+        ], className="col-md-4"),
         # Column: Bar Chart
         html.Div([
             html.H5("Statistics"),
             dbc.Table.from_dataframe(df_status, striped=True, bordered=True, hover=True)
+        ], className="col-md-4"),
+        html.Div([
+            html.H5("Messages from store owners"),
+            html.Article([
+                html.Article([
+                    html.P("Hey everone, today I am offering your a special thing bla bla bla")
+                ],className="each_message2"),
+            html.Article([
+                    html.P("Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi,")
+                ],className="each_message1"),
+            html.Article([
+                    html.P("At placeat explicabo temporibus eius est tenetur? Maiores impedit")
+                ],className="each_message2"),
+            html.Article([
+                    html.P("Hello, we are open today until 10 pm. Stop by and try our new ...")
+                ],className="each_message1")
+            ],className="message_section")
         ], className="col-md-4")
     ], className="row my-5"),
     # Row: Line Chart + Donut Chart
@@ -95,11 +124,18 @@ app.layout = html.Div([
         ], className="col-md-4"),
         html.Div([
             html.H5("Ranking"),
-            dbc.Table.from_dataframe(df_ranking, striped=True, bordered=True, hover=True)
+    dbc.Tabs(
+        [
+            dbc.Tab(regionalRanking, label="Friends"),
+            dbc.Tab(friendsRanking, label="People Around Me")
+        ]
+    )
         ], className="col-md-4")
     ], className="row mt-5"),
 
 ], className="container-fluid pt-5")
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
